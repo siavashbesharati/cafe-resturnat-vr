@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { MenuItem, Language } from '../types';
-import { Plus, ShoppingBasket, MessageSquare, ChevronLeft, ChevronRight, Globe } from 'lucide-react';
+import { Plus, ShoppingBasket, MessageSquare, ChevronLeft, ChevronRight, Globe, Menu, X } from 'lucide-react';
 import { uiTranslations } from '../translations';
 
 interface MenuViewerProps {
@@ -47,6 +47,7 @@ export default function MenuViewer({
 }: MenuViewerProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isExpanded, setIsExpanded] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [flyingItems, setFlyingItems] = useState<FlyingItem[]>([]);
   const cartButtonRef = useRef<HTMLButtonElement>(null);
   const addButtonRef = useRef<HTMLButtonElement>(null);
@@ -99,40 +100,60 @@ export default function MenuViewer({
 
   return (
     <div className="h-screen w-full bg-[#050505] flex overflow-hidden relative">
-      {/* Category Sidebar */}
-      <div className={`w-20 md:w-24 h-full bg-black/40 backdrop-blur-md border-r border-white/5 flex flex-col items-center py-8 gap-8 z-[60] ${language === 'fa' ? 'order-last border-l border-r-0' : 'order-first'}`}>
-        <div className="w-8 h-8 bg-amber-500 rounded-lg flex items-center justify-center mb-4">
-          <span className="text-black font-bold text-xl">Q</span>
-        </div>
+      {/* Sidebar Toggle Button (Floating) */}
+      <button
+        onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+        className={`absolute top-4 z-[80] p-2.5 bg-amber-500 rounded-xl text-black shadow-[0_0_20px_rgba(245,158,11,0.3)] hover:bg-amber-400 transition-all duration-300 ${
+          language === 'fa' ? 'right-4' : 'left-4'
+        }`}
+        aria-label="Toggle Menu"
+      >
+        {isSidebarOpen ? <X size={20} /> : <Menu size={20} />}
+      </button>
 
-        <button 
-          onClick={onBackToLanguage}
-          className="p-2 text-zinc-500 hover:text-white transition-colors"
-          title="Change Language"
-        >
-          <Globe size={18} />
-        </button>
-        
-        <div className="flex-1 flex flex-col gap-12 justify-center">
-          {categories.map((cat) => (
-            <button
-              key={cat}
-              onClick={() => onCategorySelect(cat)}
-              className="relative group flex items-center justify-center"
-            >
-              <span className={`text-[10px] uppercase tracking-[0.2em] font-medium transition-all duration-300 vertical-text ${selectedCategory === cat ? 'text-amber-500' : 'text-zinc-500 hover:text-white'}`}>
-                {t.categories[cat]}
-              </span>
-              {selectedCategory === cat && (
-                <motion.div 
-                  layoutId="activeCategory"
-                  className={`absolute w-1 h-8 bg-amber-500 rounded-full ${language === 'fa' ? '-right-4' : '-left-4'}`}
-                />
-              )}
-            </button>
-          ))}
+      {/* Category Sidebar */}
+      <motion.div 
+        initial={false}
+        animate={{ 
+          width: isSidebarOpen ? (window.innerWidth < 768 ? 80 : 96) : 0,
+          opacity: isSidebarOpen ? 1 : 0,
+          x: isSidebarOpen ? 0 : (language === 'fa' ? 100 : -100)
+        }}
+        transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+        className={`h-full bg-black/40 backdrop-blur-md border-white/5 flex flex-col items-center py-8 gap-8 z-[60] overflow-hidden ${
+          language === 'fa' ? 'order-last border-l' : 'order-first border-r'
+        }`}
+      >
+        <div className="min-w-[80px] flex flex-col items-center gap-8 h-full">
+          <button 
+            onClick={onBackToLanguage}
+            className="p-2 text-zinc-500 hover:text-white transition-colors shrink-0"
+            title="Change Language"
+          >
+            <Globe size={18} />
+          </button>
+          
+          <div className="flex-1 flex flex-col gap-12 justify-center">
+            {categories.map((cat) => (
+              <button
+                key={cat}
+                onClick={() => onCategorySelect(cat)}
+                className="relative group flex items-center justify-center"
+              >
+                <span className={`text-[10px] uppercase tracking-[0.2em] font-medium transition-all duration-300 vertical-text whitespace-nowrap ${selectedCategory === cat ? 'text-amber-500' : 'text-zinc-500 hover:text-white'}`}>
+                  {t.categories[cat]}
+                </span>
+                {selectedCategory === cat && (
+                  <motion.div 
+                    layoutId="activeCategory"
+                    className={`absolute w-1 h-8 bg-amber-500 rounded-full ${language === 'fa' ? '-right-4' : '-left-4'}`}
+                  />
+                )}
+              </button>
+            ))}
+          </div>
         </div>
-      </div>
+      </motion.div>
 
       <div className="flex-1 flex flex-col relative overflow-hidden">
         {/* Flying Animation Overlay */}
