@@ -20,7 +20,7 @@ export default function App() {
   const categories = ['Food', 'Breakfast', 'Softdrink', 'Hotbar'];
 
   useEffect(() => {
-    fetch('https://cafe-resturnat-vr.onrender.com/')
+    fetch('https://cafe-resturnat-vr.onrender.com/api/menu')
       .then(res => res.json())
       .then(data => {
         setMenuItems(data);
