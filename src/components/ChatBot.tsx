@@ -1,10 +1,11 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Send, Sparkles } from 'lucide-react';
+import { X, Send, Sparkles, Instagram } from 'lucide-react';
 import { Language, MenuItem } from '../types';
 import ReactMarkdown from 'react-markdown';
 import { GoogleGenAI, Type, FunctionDeclaration } from "@google/genai";
 import { uiTranslations } from '../translations';
+import ShareCard from './ShareCard';
 
 interface ChatBotProps {
   isOpen: boolean;
@@ -25,6 +26,8 @@ export default function ChatBot({ isOpen, onClose, language, currentItem, allMen
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [showShare, setShowShare] = useState(false);
+  const [shareData, setShareData] = useState({ riddle: '', answer: '' });
   const scrollRef = useRef<HTMLDivElement>(null);
 
   const addToCartTool: FunctionDeclaration = {
@@ -144,6 +147,16 @@ export default function ChatBot({ isOpen, onClose, language, currentItem, allMen
       } else {
         const responseText = result.text || t.chatError;
         setMessages(prev => [...prev, { role: 'ai', content: responseText }]);
+
+        // Check if this was a "win" message
+        if (responseText.includes('QUANTIVO15')) {
+          // Try to find the riddle in previous messages
+          const lastRiddle = messages.slice().reverse().find(m => m.role === 'ai' && m.content.length > 20);
+          setShareData({
+            riddle: lastRiddle?.content || 'Armenian Riddle Master',
+            answer: userMsg
+          });
+        }
       }
     } catch (error) {
       console.error("AI Error:", error);
@@ -183,12 +196,34 @@ export default function ChatBot({ isOpen, onClose, language, currentItem, allMen
             <div ref={scrollRef} className="flex-1 overflow-y-auto p-4 space-y-4">
               {messages.map((msg, i) => (
                 <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                  <div className={`max-w-[75%] p-3 rounded-xl text-xs ${
+                  <div className={`max-w-[75%] p-3 rounded-xl text-xs relative group ${
                     msg.role === 'user' 
                       ? 'bg-white text-black rounded-tr-none' 
                       : 'bg-zinc-900 text-zinc-300 rounded-tl-none border border-white/5'
                   }`}>
                     <ReactMarkdown>{msg.content}</ReactMarkdown>
+                    {msg.role === 'ai' && msg.content.includes('QUANTIVO15') && (
+                      <div className="mt-4 p-4 rounded-2xl bg-amber-500/5 border border-amber-500/20 space-y-3">
+                        <div className="flex items-center gap-2 text-amber-500">
+                          <Sparkles size={14} />
+                          <span className="text-[10px] uppercase tracking-widest font-bold">Riddle Solved</span>
+                        </div>
+                        <div className="space-y-1">
+                          <p className="text-[10px] text-zinc-500 uppercase tracking-widest font-bold">Question</p>
+                          <p className="text-xs italic text-zinc-300">"{shareData.riddle}"</p>
+                        </div>
+                        <div className="space-y-1">
+                          <p className="text-[10px] text-zinc-500 uppercase tracking-widest font-bold">Answer</p>
+                          <p className="text-sm font-medium text-amber-500">{shareData.answer}</p>
+                        </div>
+                        <button 
+                          onClick={() => setShowShare(true)}
+                          className="w-full flex items-center justify-center gap-2 bg-amber-500 text-black py-2 rounded-xl text-[10px] uppercase tracking-widest font-bold hover:bg-amber-400 transition-colors"
+                        >
+                          <Instagram size={12} /> Share Achievement
+                        </button>
+                      </div>
+                    )}
                   </div>
                 </div>
               ))}
@@ -226,6 +261,13 @@ export default function ChatBot({ isOpen, onClose, language, currentItem, allMen
           </div>
         </motion.div>
       )}
+      <ShareCard 
+        isOpen={showShare}
+        onClose={() => setShowShare(false)}
+        riddle={shareData.riddle}
+        answer={shareData.answer}
+        language={language}
+      />
     </AnimatePresence>
   );
 }

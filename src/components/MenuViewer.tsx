@@ -84,7 +84,7 @@ export default function MenuViewer({
     // Animation logic
     if (addButtonRef.current && cartButtonRef.current) {
       const addRect = addButtonRef.current.getBoundingClientRect();
-      const flyingId = Date.now();
+      const flyingId = Math.random() + Date.now();
       
       setFlyingItems(prev => [...prev, {
         id: flyingId,
@@ -316,8 +316,8 @@ export default function MenuViewer({
                         <div className="space-y-2">
                           <h4 className="text-[9px] text-zinc-500 uppercase tracking-widest">{t.ingredients}</h4>
                           <div className="flex flex-wrap gap-2">
-                            {currentItem.ingredients.map(ing => (
-                              <span key={ing} className="text-[10px] text-zinc-300 bg-white/5 px-2 py-0.5 rounded-full border border-white/5">{ing}</span>
+                            {currentItem.ingredients.map((ing, idx) => (
+                              <span key={`${ing}-${idx}`} className="text-[10px] text-zinc-300 bg-white/5 px-2 py-0.5 rounded-full border border-white/5">{ing}</span>
                             ))}
                           </div>
                         </div>
@@ -344,8 +344,8 @@ export default function MenuViewer({
                         <h4 className="text-[9px] text-zinc-500 uppercase tracking-widest">{t.allergies}</h4>
                         <div className="flex gap-2">
                           {currentItem.allergies.length > 0 ? (
-                            currentItem.allergies.map(a => (
-                              <span key={a} className="text-[10px] text-red-400/80 border border-red-400/20 px-2 py-0.5 rounded-sm uppercase">{a}</span>
+                            currentItem.allergies.map((a, idx) => (
+                              <span key={`${a}-${idx}`} className="text-[10px] text-red-400/80 border border-red-400/20 px-2 py-0.5 rounded-sm uppercase">{a}</span>
                             ))
                           ) : (
                             <span className="text-[10px] text-zinc-600 uppercase">{t.noneDetected}</span>
