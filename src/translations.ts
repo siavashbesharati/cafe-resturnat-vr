@@ -22,6 +22,7 @@ export const uiTranslations: Record<Language, any> = {
     chatPlaceholder: "Ask about ingredients, allergies...",
     chatError: "I apologize, but I'm having trouble connecting right now. Please try again later.",
     aiConcierge: "Concierge Service",
+    itemAddedToCart: "✅ **{item}** has been added to your cart. Would you like to see anything else?",
     categories: {
       Food: "Food",
       Breakfast: "Breakfast",
@@ -50,6 +51,7 @@ export const uiTranslations: Record<Language, any> = {
     chatPlaceholder: "Հարցրեք բաղադրիչների, ալերգիաների մասին...",
     chatError: "Ցավոք, կապի խնդիր կա: Խնդրում ենք փորձել մի փոքր ուշ:",
     aiConcierge: "Սպասարկման ծառայություն",
+    itemAddedToCart: "✅ **{item}**-ը ավելացվել է ձեր զամբյուղում: Էլի ինչ-որ բանո՞վ կարող եմ օգնել:",
     categories: {
       Food: "Սնունդ",
       Breakfast: "Նախաճաշ",
@@ -78,6 +80,7 @@ export const uiTranslations: Record<Language, any> = {
     chatPlaceholder: "Спросите об ингредиентах, аллергиях...",
     chatError: "Приносим извинения, возникли проблемы с подключением. Пожалуйста, попробуйте позже.",
     aiConcierge: "Консьерж-сервис",
+    itemAddedToCart: "✅ **{item}** добавлено в вашу корзину. Желаете что-нибудь еще?",
     categories: {
       Food: "Еда",
       Breakfast: "Завтрак",
@@ -106,6 +109,7 @@ export const uiTranslations: Record<Language, any> = {
     chatPlaceholder: "İçindekiler, alerjiler hakkında sorun...",
     chatError: "Özür dileriz, şu anda bağlantı sorunu yaşıyoruz. Lütfen daha sonra tekrar deneyin.",
     aiConcierge: "Konsiyerj Hizmeti",
+    itemAddedToCart: "✅ **{item}** sepetinize eklendi. Başka bir şey ister misiniz?",
     categories: {
       Food: "Yemek",
       Breakfast: "Kahvaltı",
@@ -134,6 +138,7 @@ export const uiTranslations: Record<Language, any> = {
     chatPlaceholder: "در مورد ترکیبات، حساسیت‌ها بپرسید...",
     chatError: "متاسفیم، مشکلی در اتصال پیش آمده است. لطفاً بعداً دوباره تلاش کنید.",
     aiConcierge: "خدمات کانسیرژ",
+    itemAddedToCart: "✅ **{item}** به سبد خرید شما اضافه شد. آیا مورد دیگری لازم دارید؟",
     categories: {
       Food: "غذا",
       Breakfast: "صبحانه",

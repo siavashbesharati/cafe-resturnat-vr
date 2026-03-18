@@ -112,6 +112,7 @@ export default function App() {
         language={language}
         currentItem={translatedMenu[activeIndex]}
         allMenu={translatedMenu}
+        onAddToCart={addToCart}
       />
 
       <Cart 

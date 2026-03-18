@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X, Send, Sparkles } from 'lucide-react';
 import { Language, MenuItem } from '../types';
 import ReactMarkdown from 'react-markdown';
-import { GoogleGenAI } from "@google/genai";
+import { GoogleGenAI, Type, FunctionDeclaration } from "@google/genai";
 import { uiTranslations } from '../translations';
 
 interface ChatBotProps {
@@ -12,6 +12,7 @@ interface ChatBotProps {
   language: Language;
   currentItem: MenuItem;
   allMenu: MenuItem[];
+  onAddToCart: (item: MenuItem) => void;
 }
 
 interface Message {
@@ -19,12 +20,27 @@ interface Message {
   content: string;
 }
 
-export default function ChatBot({ isOpen, onClose, language, currentItem, allMenu }: ChatBotProps) {
+export default function ChatBot({ isOpen, onClose, language, currentItem, allMenu, onAddToCart }: ChatBotProps) {
   const t = uiTranslations[language];
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
+
+  const addToCartTool: FunctionDeclaration = {
+    name: "add_to_cart",
+    parameters: {
+      type: Type.OBJECT,
+      description: "Add a menu item to the customer's shopping cart.",
+      properties: {
+        itemId: {
+          type: Type.STRING,
+          description: "The unique ID of the menu item to add.",
+        },
+      },
+      required: ["itemId"],
+    },
+  };
 
   useEffect(() => {
     if (isOpen && messages.length === 0) {
@@ -53,31 +69,35 @@ export default function ChatBot({ isOpen, onClose, language, currentItem, allMen
       
       const systemInstruction = `
         You are "Quantivo AI", a sophisticated and highly intelligent concierge for Quantivo Smart Menu.
-        Your tone is elegant, professional, and extremely helpful.
-        
+        Your primary goal is to provide a premium experience while strategically UPSELLING and suggesting PAIRINGS to increase order value.
+
         Current Language: ${language}
         Current Menu Item being viewed: ${JSON.stringify(currentItem)}
         Full Menu Context: ${JSON.stringify(allMenu)}
 
         CORE CAPABILITIES:
-        1. DIETARY SAFETY (PRIORITY): If a user mentions an allergy (e.g., gluten, nuts, dairy), you must IMMEDIATELY identify if the current item is safe. Then, suggest other safe alternatives from the Full Menu Context.
-        2. HEALTH & WELLNESS ADVISOR: If a user mentions a health condition (e.g., "I have a cold", "I'm feeling tired", "I need an energy boost"), analyze the 'ingredients' of all menu items to find the best matches.
-           - For a cold: Recommend the "Miso Glazed Black Cod" because it contains **Ginger** (anti-inflammatory) or the "Electric Sapphire" because it contains **Yuzu** (high in Vitamin C).
-           - For energy: Suggest items with high protein like "Wagyu Ribeye" or "Lobster Tagliatelle".
-           - For relaxation: Suggest lighter items like the "Zen Garden Salad".
-        3. INGREDIENT EXPERT: You know every detail of the menu. Explain the origin and quality of ingredients (e.g., A5 Wagyu from Kagoshima, 24k Gold Leaf).
-        4. CONCISE ELEGANCE: Do not be overly wordy, but provide COMPLETE and CLEAR answers. Get straight to the helpful information while maintaining a premium "concierge" persona.
-        5. MULTILINGUAL: Always respond in the language the user is speaking, which should be ${language}.
+        1. STRATEGIC UPSELLING: Whenever a user asks about an item, always suggest a complementary item from the Full Menu Context.
+           - If they look at a dessert (like Carrot Cake or Strawberry Cake), suggest a beverage or a contrasting fruit (like Pomegranate).
+           - Use persuasive, elegant language: "To elevate your experience, I highly recommend pairing this with..."
+        2. ADD TO CART: Use the 'add_to_cart' tool ONLY when the user explicitly confirms they want to purchase or add an item.
+           - Positive triggers: "yes", "add it", "I want this", "please order it", "ok", "sure".
+           - NEGATIVE triggers (DO NOT CALL TOOL): "no", "nah", "not now", "maybe later", "نه" (Persian for no).
+           - If the user says "no" or "نه" to a suggestion, simply acknowledge it politely and ask if there's anything else they need.
+        3. DIETARY SAFETY (PRIORITY): If a user mentions an allergy, identify if the current item is safe. Then, suggest safe alternatives.
+        4. HEALTH & WELLNESS ADVISOR: Analyze 'ingredients' to find matches for user needs (e.g., energy, immunity, relaxation).
+        5. INGREDIENT EXPERT: Explain the premium quality and origin of ingredients to justify the price and build desire.
+        6. CONCISE ELEGANCE: Maintain a premium "concierge" persona. Be helpful, persuasive, and professional.
+        7. MULTILINGUAL: Always respond in ${language}.
 
-        SPECIFIC DATA HANDLING:
-        - Cross-reference the 'allergies' array and 'ingredients' list for every item.
-        - If a user has a gluten allergy, recommend: Wagyu Ribeye, Electric Sapphire, Gold Leaf Otoro, Zen Garden Salad, Liquid Nitrogen Sphere, Miso Glazed Black Cod, or Smoked Old Fashioned.
-        - If a user has a nut allergy, check the 'ingredients' for any nut oils or garnishes.
+        UPSELLING STRATEGY:
+        - If they are viewing "Heritage Carrot Cake", suggest the "Royal Pomegranate" as a refreshing palate cleanser.
+        - If they are viewing "Strawberry Chocolate Dream", highlight the richness of the dark chocolate and suggest a pairing.
+        - Always mention the unique history or nutrition facts to make the items more appealing.
 
         Response Format:
-        - Use Markdown for clarity (bolding, lists).
-        - Start with a direct answer to the user's concern.
-        - If suggesting items, explain WHY based on their ingredients.
+        - Use Markdown (bolding, lists).
+        - Start with a direct answer.
+        - Always end with a subtle, elegant suggestion for another item or an "add-on" thought.
       `;
 
       // Build history for the model
@@ -96,11 +116,29 @@ export default function ChatBot({ isOpen, onClose, language, currentItem, allMen
           systemInstruction,
           maxOutputTokens: 1000,
           temperature: 0.7,
+          tools: [{ functionDeclarations: [addToCartTool] }],
         },
       });
 
-      const responseText = result.text || t.chatError;
-      setMessages(prev => [...prev, { role: 'ai', content: responseText }]);
+      const functionCalls = result.functionCalls;
+      if (functionCalls) {
+        for (const call of functionCalls) {
+          if (call.name === 'add_to_cart') {
+            const { itemId } = call.args as { itemId: string };
+            const item = allMenu.find(i => i.id === itemId);
+            if (item) {
+              onAddToCart(item);
+              const confirmMsg = t.itemAddedToCart.replace('{item}', item.name);
+              setMessages(prev => [...prev, { role: 'ai', content: confirmMsg }]);
+            } else {
+              setMessages(prev => [...prev, { role: 'ai', content: "I'm sorry, I couldn't find that item in our menu." }]);
+            }
+          }
+        }
+      } else {
+        const responseText = result.text || t.chatError;
+        setMessages(prev => [...prev, { role: 'ai', content: responseText }]);
+      }
     } catch (error) {
       console.error("AI Error:", error);
       setMessages(prev => [...prev, { role: 'ai', content: t.chatError }]);

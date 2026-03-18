@@ -92,6 +92,25 @@ async function startServer() {
         tr: { name: "Tatlı Sarı Soğan", description: "Hafif tadı ve gevrek dokusuyla bilinen birinci sınıf büyük sarı soğan.", category: "Yemek", ingredients: ["Sarı Soğan"], allergies: [], history: "Yadigarı çeşitlerde uzmanlaşmış organik çiftliklerden temin edilmiştir." },
         fa: { name: "پیاز زرد شیرین", description: "پیاز زرد بزرگ و ممتاز که به دلیل طعم ملایم و بافت تردش شناخته شده است.", category: "غذا", ingredients: ["پیاز زرد"], allergies: ["گلوتن", "لبنیات", "آجیل"], history: "تهیه شده از مزارع ارگانیک که در گونه‌های اصیل تخصص دارند." }
       }
+    },
+    {
+      id: "espresso-01",
+      name: "Artisan Espresso",
+      price: 1200,
+      description: "A rich, full-bodied espresso with notes of dark chocolate and a velvety crema. Sourced from sustainable highland farms.",
+      modelUrl: "https://pub-0f2db2459b794af9a9ce4bdd6a8ba29a.r2.dev/coffee_cup_1k-v1.glb",
+      category: "Drink",
+      ingredients: ["Arabica Coffee Beans", "Purified Water"],
+      allergies: [],
+      nutrition: { calories: 2, protein: "0.1g", fat: "0g" },
+      history: "Our beans are roasted in small batches to preserve the delicate aromatic oils and ensure a perfect pull every time.",
+      translations: {
+        en: { name: "Artisan Espresso", description: "A rich, full-bodied espresso with notes of dark chocolate and a velvety crema.", category: "Drink", ingredients: ["Coffee Beans"], allergies: [], history: "Roasted in small batches." },
+        am: { name: "Արհեստավարժ Էսպրեսո", description: "Հարուստ, թունդ էսպրեսո՝ մուգ շոկոլադի նոտաներով:", category: "Ըմպելիք", ingredients: ["Սուրճի հատիկներ"], allergies: [], history: "Տապակված փոքր խմբաքանակներով:" },
+        ru: { name: "Ремесленный эспрессо", description: "Насыщенный эспрессо с нотками темного шоколада и бархатистой пенкой.", category: "Напитки", ingredients: ["Кофейные зерна"], allergies: [], history: "Обжаривается небольшими партиями." },
+        tr: { name: "Zanaatkar Espresso", description: "Bitter çikolata notaları ve kadifemsi kreması ile zengin, dolgun gövdeli bir espresso.", category: "İçecek", ingredients: ["Kahve Çekirdekleri"], allergies: [], history: "Küçük partiler halinde kavrulmuştur." },
+        fa: { name: "اسپرسو آرتیزان", description: "یک اسپرسوی غنی و غلیظ با نت‌های شکلات تلخ و کرمای مخملی.", category: "نوشیدنی", ingredients: ["دانه‌های قهوه"], allergies: [], history: "در دسته‌های کوچک برشته شده است." }
+      }
     }
   ];
 
