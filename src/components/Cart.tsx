@@ -17,8 +17,25 @@ interface CartProps {
 export default function Cart({ isOpen, onClose, items, onRemove, onClear, onOrderSubmit, language }: CartProps) {
   const [isOrdering, setIsOrdering] = useState(false);
   const [orderComplete, setOrderComplete] = useState(false);
-  const total = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  const [discountCode, setDiscountCode] = useState('');
+  const [discountApplied, setDiscountApplied] = useState(false);
+  const [discountError, setDiscountError] = useState(false);
+  
+  const subtotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  const discountAmount = discountApplied ? subtotal * 0.15 : 0;
+  const total = subtotal - discountAmount;
+  
   const t = uiTranslations[language];
+
+  const handleApplyDiscount = () => {
+    if (discountCode.toUpperCase() === 'QUANTIVO15') {
+      setDiscountApplied(true);
+      setDiscountError(false);
+    } else {
+      setDiscountError(true);
+      setDiscountApplied(false);
+    }
+  };
 
   const handleSendToKitchen = async () => {
     setIsOrdering(true);
@@ -32,6 +49,8 @@ export default function Cart({ isOpen, onClose, items, onRemove, onClear, onOrde
     setTimeout(() => {
       onClear();
       setOrderComplete(false);
+      setDiscountApplied(false);
+      setDiscountCode('');
       onClose();
     }, 3000);
   };
@@ -116,10 +135,54 @@ export default function Cart({ isOpen, onClose, items, onRemove, onClear, onOrde
 
             {!orderComplete && (
               <div className="p-8 bg-zinc-900/30 border-t border-white/5 space-y-6">
-                <div className="flex justify-between items-center">
-                  <span className="text-zinc-500 uppercase tracking-widest text-xs">{t.total}</span>
-                  <span className="text-2xl text-white font-light">{total.toLocaleString()} ֏</span>
+                {items.length > 0 && (
+                  <div className="space-y-3">
+                    <div className="flex gap-2">
+                      <input
+                        type="text"
+                        value={discountCode}
+                        onChange={(e) => {
+                          setDiscountCode(e.target.value);
+                          setDiscountError(false);
+                        }}
+                        placeholder={t.discountCode}
+                        className={`flex-1 bg-black border ${discountError ? 'border-red-500' : 'border-white/10'} rounded-full py-2 px-4 text-white text-xs focus:outline-none focus:border-amber-500/50 transition-colors`}
+                      />
+                      <button
+                        onClick={handleApplyDiscount}
+                        className="bg-zinc-800 text-white px-6 py-2 rounded-full text-xs font-medium hover:bg-zinc-700 transition-colors"
+                      >
+                        {t.apply}
+                      </button>
+                    </div>
+                    {discountApplied && (
+                      <p className="text-emerald-500 text-[10px] uppercase tracking-widest">{t.discountApplied}</p>
+                    )}
+                    {discountError && (
+                      <p className="text-red-500 text-[10px] uppercase tracking-widest">{t.invalidCode}</p>
+                    )}
+                  </div>
+                )}
+
+                <div className="space-y-2">
+                  {discountApplied && (
+                    <div className="flex justify-between items-center text-zinc-500 text-xs uppercase tracking-widest">
+                      <span>{t.subtotal}</span>
+                      <span>{subtotal.toLocaleString()} ֏</span>
+                    </div>
+                  )}
+                  {discountApplied && (
+                    <div className="flex justify-between items-center text-emerald-500 text-xs uppercase tracking-widest">
+                      <span>{t.discount} (15%)</span>
+                      <span>-{discountAmount.toLocaleString()} ֏</span>
+                    </div>
+                  )}
+                  <div className="flex justify-between items-center pt-2">
+                    <span className="text-zinc-500 uppercase tracking-widest text-xs">{t.total}</span>
+                    <span className="text-2xl text-white font-light">{total.toLocaleString()} ֏</span>
+                  </div>
                 </div>
+                
                 <button 
                   onClick={handleSendToKitchen}
                   disabled={items.length === 0 || isOrdering}
