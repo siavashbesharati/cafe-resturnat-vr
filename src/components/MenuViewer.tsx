@@ -49,6 +49,8 @@ export default function MenuViewer({
   const [isExpanded, setIsExpanded] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [flyingItems, setFlyingItems] = useState<FlyingItem[]>([]);
+  const [splitRatio, setSplitRatio] = useState(50); // Percentage for bottom panel
+  const containerRef = useRef<HTMLDivElement>(null);
   const cartButtonRef = useRef<HTMLButtonElement>(null);
   const addButtonRef = useRef<HTMLButtonElement>(null);
   const t = uiTranslations[language];
@@ -98,8 +100,20 @@ export default function MenuViewer({
     }
   };
 
+  const handleResize = (event: any, info: any) => {
+    if (!containerRef.current) return;
+    const containerHeight = containerRef.current.offsetHeight;
+    const newBottomHeight = containerHeight - info.point.y;
+    const newRatio = (newBottomHeight / containerHeight) * 100;
+    
+    // Constraints: 20% to 85%
+    const clampedRatio = Math.min(Math.max(newRatio, 20), 85);
+    setSplitRatio(clampedRatio);
+    setIsExpanded(false); // Reset expanded state if manually resizing
+  };
+
   return (
-    <div className="h-screen w-full bg-[#050505] flex overflow-hidden relative">
+    <div ref={containerRef} className="h-[100dvh] w-full bg-[#050505] flex overflow-hidden relative">
       {/* Sidebar Toggle Button (Floating) */}
       <button
         onClick={() => setIsSidebarOpen(!isSidebarOpen)}
@@ -187,11 +201,14 @@ export default function MenuViewer({
           })}
         </AnimatePresence>
 
-        {/* Top 50%: 3D Viewer */}
+        {/* Top Section: 3D Viewer */}
         <motion.div 
-          className="w-full relative flex-1"
-          animate={{ height: isExpanded ? '0%' : '50%', opacity: isExpanded ? 0 : 1 }}
-          transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+          className="w-full relative overflow-hidden"
+          animate={{ 
+            height: isExpanded ? '0%' : `${100 - splitRatio}%`, 
+            opacity: isExpanded ? 0 : 1 
+          }}
+          transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
         >
           {items.length > 0 && currentItem ? (
             <AnimatePresence mode="wait">
@@ -250,20 +267,27 @@ export default function MenuViewer({
           )}
         </motion.div>
 
+        {/* Resizable Handle */}
+        {!isExpanded && (
+          <motion.div
+            drag="y"
+            dragConstraints={{ top: 0, bottom: 0 }}
+            dragElastic={0}
+            dragMomentum={false}
+            onDrag={handleResize}
+            className="h-8 w-full flex items-center justify-center cursor-row-resize z-[70] relative -my-4"
+          >
+            <div className="w-16 h-1.5 bg-white/20 rounded-full hover:bg-amber-500/50 transition-colors" />
+          </motion.div>
+        )}
+
         {/* Bottom Section: Details Panel */}
         <motion.div 
-          className="w-full bg-gradient-to-t from-black via-zinc-900/50 to-transparent backdrop-blur-xl border-t border-white/5 p-8 flex flex-col relative z-50 touch-none"
-          animate={{ height: isExpanded ? '100%' : '50%' }}
-          transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-          onPanEnd={(_, info) => {
-            if (info.offset.y < -50) setIsExpanded(true);
-            if (info.offset.y > 50) setIsExpanded(false);
-          }}
+          className="w-full bg-gradient-to-t from-black via-zinc-900/50 to-transparent backdrop-blur-xl border-t border-white/5 p-8 flex flex-col relative z-50 overflow-hidden"
+          animate={{ height: isExpanded ? '100%' : `${splitRatio}%` }}
+          transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
         >
-          {/* Drag Handle */}
-          <div className="absolute top-2 left-1/2 -translate-x-1/2 w-12 h-1 bg-white/10 rounded-full" />
-          
-          <div className={`flex-1 overflow-y-auto no-scrollbar ${isExpanded ? 'touch-auto' : 'touch-none'}`}>
+          <div className={`flex-1 overflow-y-auto no-scrollbar ${isExpanded ? 'touch-auto' : 'touch-auto'}`}>
             {items.length > 0 && currentItem ? (
               <AnimatePresence mode="wait">
                 <motion.div
