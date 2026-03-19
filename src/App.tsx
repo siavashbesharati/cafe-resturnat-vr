@@ -110,7 +110,7 @@ export default function App() {
         isOpen={isChatOpen}
         onClose={() => setIsChatOpen(false)}
         language={language}
-        currentItem={translatedMenu[activeIndex]}
+        currentItem={filteredMenu[activeIndex]}
         allMenu={translatedMenu}
         onAddToCart={addToCart}
       />

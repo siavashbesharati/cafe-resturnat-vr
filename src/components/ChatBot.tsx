@@ -133,17 +133,18 @@ export default function ChatBot({ isOpen, onClose, language, currentItem, allMen
 
       const functionCalls = result.functionCalls;
       if (functionCalls) {
-        for (const call of functionCalls) {
+        for (let i = 0; i < functionCalls.length; i++) {
+          const call = functionCalls[i];
           if (call.name === 'add_to_cart') {
             const { itemId } = call.args as { itemId: string };
             const item = allMenu.find(i => i.id === itemId);
             if (item) {
               onAddToCart(item);
               const confirmMsg = t.itemAddedToCart.replace('{item}', item.name);
-              const aiMsgId = `ai-cart-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+              const aiMsgId = `ai-cart-${Date.now()}-${i}-${Math.random().toString(36).substr(2, 9)}`;
               setMessages(prev => [...prev, { id: aiMsgId, role: 'ai', content: confirmMsg }]);
             } else {
-              const aiErrorId = `ai-error-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+              const aiErrorId = `ai-error-${Date.now()}-${i}-${Math.random().toString(36).substr(2, 9)}`;
               setMessages(prev => [...prev, { id: aiErrorId, role: 'ai', content: "I'm sorry, I couldn't find that item in our menu." }]);
             }
           }

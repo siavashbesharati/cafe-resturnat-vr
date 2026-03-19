@@ -1,7 +1,7 @@
 import React, { useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Download, Instagram, Sparkles, ChefHat } from 'lucide-react';
-import html2canvas from 'html2canvas';
+import { X, Download, Sparkles, ChefHat } from 'lucide-react';
+import * as htmlToImage from 'html-to-image';
 
 interface ShareCardProps {
   isOpen: boolean;
@@ -17,26 +17,26 @@ export default function ShareCard({ isOpen, onClose, rank, label, language }: Sh
   const handleDownload = async () => {
     if (!cardRef.current) return;
     
-    // Small delay to ensure rendering
-    await new Promise(resolve => setTimeout(resolve, 100));
-    
-    const canvas = await html2canvas(cardRef.current, {
-      backgroundColor: '#000',
-      scale: 3, // Higher scale for better quality
-      logging: false,
-      useCORS: true,
-      allowTaint: true,
-      onclone: (clonedDoc) => {
-        // Ensure the cloned element is visible for capture
-        const el = clonedDoc.querySelector('[data-capture-card="true"]') as HTMLElement;
-        if (el) el.style.visibility = 'visible';
-      }
-    });
-    
-    const link = document.createElement('a');
-    link.download = `quantivo-genius-${Date.now()}.png`;
-    link.href = canvas.toDataURL('image/png');
-    link.click();
+    try {
+      // Small delay to ensure rendering
+      await new Promise(resolve => setTimeout(resolve, 200));
+      
+      const dataUrl = await htmlToImage.toPng(cardRef.current, {
+        quality: 1.0,
+        pixelRatio: 3,
+        backgroundColor: '#000000',
+        style: {
+          visibility: 'visible',
+        }
+      });
+      
+      const link = document.createElement('a');
+      link.download = `quantivo-genius-${Date.now()}.png`;
+      link.href = dataUrl;
+      link.click();
+    } catch (error) {
+      console.error('Screenshot failed:', error);
+    }
   };
 
   return (
@@ -50,13 +50,13 @@ export default function ShareCard({ isOpen, onClose, rank, label, language }: Sh
         >
           <div className="max-w-sm w-full space-y-6">
             <div className="flex justify-between items-center text-white">
-              <h3 className="text-[10px] font-bold uppercase tracking-[0.3em] text-amber-500">Achievement Unlocked</h3>
-              <button onClick={onClose} className="p-2 hover:bg-white/10 rounded-full transition-colors text-zinc-500 hover:text-white">
+              <h3 className="text-[10px] font-bold uppercase tracking-[0.3em]" style={{ color: '#f59e0b' }}>Achievement Unlocked</h3>
+              <button onClick={onClose} className="p-2 hover:bg-white/10 rounded-full transition-colors" style={{ color: '#71717a' }}>
                 <X size={20} />
               </button>
             </div>
 
-            {/* The Card to be captured - Simplified "Pure" Design */}
+            {/* The Card to be captured - Simplified "Pure" Design with HEX colors to avoid oklab issues */}
             <div 
               ref={cardRef}
               data-capture-card="true"
@@ -64,30 +64,30 @@ export default function ShareCard({ isOpen, onClose, rank, label, language }: Sh
               style={{ backgroundColor: '#000000', borderColor: 'rgba(255, 255, 255, 0.1)' }}
             >
               {/* Decorative Background Elements */}
-              <div className="absolute top-0 right-0 w-32 h-32 bg-amber-500/10 blur-[60px] rounded-full -mr-16 -mt-16" />
-              <div className="absolute bottom-0 left-0 w-32 h-32 bg-amber-500/10 blur-[60px] rounded-full -ml-16 -mb-16" />
+              <div className="absolute top-0 right-0 w-32 h-32 blur-[60px] rounded-full -mr-16 -mt-16" style={{ backgroundColor: 'rgba(245, 158, 11, 0.1)' }} />
+              <div className="absolute bottom-0 left-0 w-32 h-32 blur-[60px] rounded-full -ml-16 -mb-16" style={{ backgroundColor: 'rgba(245, 158, 11, 0.1)' }} />
 
               <div className="space-y-12 relative z-10">
                 <div className="space-y-4">
-                  <div className="w-12 h-12 bg-amber-500 rounded-full flex items-center justify-center text-black mb-6">
+                  <div className="w-12 h-12 rounded-full flex items-center justify-center text-black mb-6" style={{ backgroundColor: '#f59e0b' }}>
                     <Sparkles size={24} />
                   </div>
                   <h2 className="text-4xl font-black tracking-tighter text-white uppercase leading-none">
                     YOU ARE A<br />
-                    <span className="text-amber-500">{label}</span>
+                    <span style={{ color: '#f59e0b' }}>{label}</span>
                   </h2>
-                  <p className="text-sm text-zinc-400 font-medium leading-relaxed">
+                  <p className="text-sm font-medium leading-relaxed" style={{ color: '#a1a1aa' }}>
                     You solved a riddle that <span className="text-white font-bold">{rank}</span> of our customers could not solve.
                   </p>
                 </div>
                 
                 <div className="space-y-2">
                   <div className="flex items-center gap-2">
-                    <div className="h-[1px] flex-1 bg-white/10" />
-                    <span className="text-[8px] uppercase tracking-[0.4em] text-zinc-500 font-bold">Official Recognition</span>
-                    <div className="h-[1px] flex-1 bg-white/10" />
+                    <div className="h-[1px] flex-1" style={{ backgroundColor: 'rgba(255, 255, 255, 0.1)' }} />
+                    <span className="text-[8px] uppercase tracking-[0.4em] font-bold" style={{ color: '#71717a' }}>Official Recognition</span>
+                    <div className="h-[1px] flex-1" style={{ backgroundColor: 'rgba(255, 255, 255, 0.1)' }} />
                   </div>
-                  <p className="text-[10px] text-center text-zinc-300 italic">
+                  <p className="text-[10px] text-center italic" style={{ color: '#d4d4d8' }}>
                     "Intelligence is the ability to adapt to change."
                   </p>
                 </div>
@@ -98,7 +98,7 @@ export default function ShareCard({ isOpen, onClose, rank, label, language }: Sh
                   <p className="text-[11px] uppercase tracking-[0.5em] font-black" style={{ color: '#ffffff' }}>Quantivo AI</p>
                   <p className="text-[8px] uppercase tracking-[0.2em]" style={{ color: '#52525b' }}>Verified Achievement • 2026</p>
                 </div>
-                <div className="w-10 h-10 border border-white/20 rounded-lg flex items-center justify-center opacity-50">
+                <div className="w-10 h-10 border rounded-lg flex items-center justify-center opacity-50" style={{ borderColor: 'rgba(255, 255, 255, 0.2)' }}>
                   <ChefHat size={20} className="text-white" />
                 </div>
               </div>
