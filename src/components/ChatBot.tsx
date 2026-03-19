@@ -234,7 +234,7 @@ export default function ChatBot({ isOpen, onClose, language, currentItem, allMen
                           onClick={() => setShowShare(true)}
                           className="w-full flex items-center justify-center gap-3 bg-amber-500 text-black py-4 rounded-2xl text-xs font-black uppercase tracking-[0.2em] hover:bg-amber-400 transition-all active:scale-95 shadow-[0_0_30px_rgba(245,158,11,0.4)]"
                         >
-                          <Download size={16} /> Create Screenshot
+                          <Instagram size={16} /> {t.shareAsStory}
                         </button>
                       </div>
                     )}

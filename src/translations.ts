@@ -29,6 +29,7 @@ export const uiTranslations: Record<Language, any> = {
     discountApplied: "Discount Applied!",
     subtotal: "Subtotal",
     discount: "Discount",
+    shareAsStory: "Share as Story",
     categories: {
       Food: "Food",
       Breakfast: "Breakfast",
@@ -64,6 +65,7 @@ export const uiTranslations: Record<Language, any> = {
     discountApplied: "Զեղչը կիրառվեց:",
     subtotal: "Ենթագումար",
     discount: "Զեղչ",
+    shareAsStory: "Կիսվել որպես Story",
     categories: {
       Food: "Սնունդ",
       Breakfast: "Նախաճաշ",
@@ -99,6 +101,7 @@ export const uiTranslations: Record<Language, any> = {
     discountApplied: "Скидка применена!",
     subtotal: "Подытог",
     discount: "Скидка",
+    shareAsStory: "Поделиться в Story",
     categories: {
       Food: "Еда",
       Breakfast: "Завтрак",
@@ -134,6 +137,7 @@ export const uiTranslations: Record<Language, any> = {
     discountApplied: "İndirim Uygulandı!",
     subtotal: "Ara Toplam",
     discount: "İndirim",
+    shareAsStory: "Story olarak paylaş",
     categories: {
       Food: "Yemek",
       Breakfast: "Kahvaltı",
@@ -169,6 +173,7 @@ export const uiTranslations: Record<Language, any> = {
     discountApplied: "تخفیف اعمال شد!",
     subtotal: "جمع جزء",
     discount: "تخفیف",
+    shareAsStory: "اشتراک‌گذاری در استوری",
     categories: {
       Food: "غذا",
       Breakfast: "صبحانه",

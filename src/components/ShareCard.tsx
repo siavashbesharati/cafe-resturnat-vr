@@ -1,17 +1,20 @@
 import React, { useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Download, Sparkles, ChefHat } from 'lucide-react';
+import { X, Download, Sparkles, ChefHat, Instagram } from 'lucide-react';
 import * as htmlToImage from 'html-to-image';
+import { uiTranslations } from '../translations';
+import { Language } from '../types';
 
 interface ShareCardProps {
   isOpen: boolean;
   onClose: () => void;
   rank: string;
   label: string;
-  language: string;
+  language: Language;
 }
 
 export default function ShareCard({ isOpen, onClose, rank, label, language }: ShareCardProps) {
+  const t = uiTranslations[language];
   const cardRef = useRef<HTMLDivElement>(null);
 
   const handleDownload = async () => {
@@ -109,7 +112,7 @@ export default function ShareCard({ isOpen, onClose, rank, label, language }: Sh
                 onClick={handleDownload}
                 className="flex items-center justify-center gap-3 bg-amber-500 text-black py-4 rounded-2xl text-xs font-bold uppercase tracking-widest hover:bg-amber-400 transition-all active:scale-95 shadow-[0_0_20px_rgba(245,158,11,0.3)]"
               >
-                <Download size={16} /> Save Achievement
+                <Instagram size={16} /> {t.shareAsStory}
               </button>
               <button 
                 onClick={onClose}
