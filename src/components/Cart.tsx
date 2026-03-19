@@ -62,7 +62,7 @@ export default function Cart({ isOpen, onClose, items, onRemove, onClear, onOrde
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed inset-0 z-[70] bg-black/80 backdrop-blur-sm flex justify-end"
+          className="fixed inset-0 z-[1000] bg-black/80 backdrop-blur-sm flex justify-end"
         >
           <motion.div
             initial={{ x: '100%' }}

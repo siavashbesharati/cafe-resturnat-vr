@@ -173,11 +173,11 @@ export default function ChatBot({ isOpen, onClose, language, currentItem, allMen
           initial={{ opacity: 0, y: 100, scale: 0.9 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
           exit={{ opacity: 0, y: 100, scale: 0.9 }}
-          className="fixed inset-0 z-[60] flex items-end justify-center p-4 sm:p-6"
+          className="fixed inset-0 z-[1000] flex items-end justify-center p-4 sm:p-6"
         >
-          <div className="w-full max-w-lg bg-[#0a0a0a] border border-white/10 rounded-3xl overflow-hidden flex flex-col h-[80vh] shadow-2xl">
+          <div className="w-full max-w-lg bg-black border border-white/10 rounded-3xl overflow-hidden flex flex-col h-[80vh] shadow-2xl">
             {/* Header */}
-            <div className="p-4 border-b border-white/5 flex justify-between items-center bg-zinc-900/50">
+            <div className="p-4 border-b border-white/5 flex justify-between items-center bg-[#121212]">
               <div className="flex items-center gap-3">
                 <div className="w-8 h-8 bg-amber-500 rounded-full flex items-center justify-center text-black">
                   <Sparkles size={16} />
@@ -196,10 +196,10 @@ export default function ChatBot({ isOpen, onClose, language, currentItem, allMen
             <div ref={scrollRef} className="flex-1 overflow-y-auto p-4 space-y-4">
               {messages.map((msg, i) => (
                 <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                  <div className={`max-w-[75%] p-3 rounded-xl text-xs relative group ${
+                  <div className={`max-w-[85%] p-4 rounded-2xl text-xs relative group ${
                     msg.role === 'user' 
-                      ? 'bg-white text-black rounded-tr-none' 
-                      : 'bg-zinc-900 text-zinc-300 rounded-tl-none border border-white/5'
+                      ? 'bg-white text-black rounded-tr-none shadow-lg' 
+                      : 'bg-zinc-800 text-zinc-100 rounded-tl-none border border-white/10 shadow-md'
                   }`}>
                     <ReactMarkdown>{msg.content}</ReactMarkdown>
                     {msg.role === 'ai' && msg.content.includes('QUANTIVO15') && (
@@ -239,7 +239,7 @@ export default function ChatBot({ isOpen, onClose, language, currentItem, allMen
             </div>
 
             {/* Input */}
-            <div className="p-4 bg-zinc-900/50 border-t border-white/5">
+            <div className="p-4 bg-[#121212] border-t border-white/5">
               <div className="relative">
                 <input
                   type="text"
