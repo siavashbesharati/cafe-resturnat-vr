@@ -148,9 +148,9 @@ export default function MenuViewer({
           </button>
           
           <div className="flex-1 flex flex-col gap-12 justify-center">
-            {categories.map((cat) => (
+            {categories.map((cat, idx) => (
               <button
-                key={cat}
+                key={`${cat}-${idx}`}
                 onClick={() => onCategorySelect(cat)}
                 className="relative group flex items-center justify-center"
               >

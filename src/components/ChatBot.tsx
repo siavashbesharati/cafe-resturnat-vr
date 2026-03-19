@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Send, Sparkles, Instagram } from 'lucide-react';
+import { X, Send, Sparkles, Instagram, Download } from 'lucide-react';
 import { Language, MenuItem } from '../types';
 import ReactMarkdown from 'react-markdown';
 import { GoogleGenAI, Type, FunctionDeclaration } from "@google/genai";
@@ -17,6 +17,7 @@ interface ChatBotProps {
 }
 
 interface Message {
+  id: string;
   role: 'user' | 'ai';
   content: string;
 }
@@ -27,7 +28,7 @@ export default function ChatBot({ isOpen, onClose, language, currentItem, allMen
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [showShare, setShowShare] = useState(false);
-  const [shareData, setShareData] = useState({ riddle: '', answer: '' });
+  const [shareData, setShareData] = useState({ rank: '99.8%', label: 'GENIUS' });
   const scrollRef = useRef<HTMLDivElement>(null);
 
   const addToCartTool: FunctionDeclaration = {
@@ -48,7 +49,7 @@ export default function ChatBot({ isOpen, onClose, language, currentItem, allMen
   useEffect(() => {
     if (isOpen && messages.length === 0) {
       setMessages([
-        { role: 'ai', content: t.chatGreeting.replace('{item}', currentItem.name) }
+        { id: 'initial-ai', role: 'ai', content: t.chatGreeting.replace('{item}', currentItem.name) }
       ]);
     }
   }, [isOpen, currentItem.name, t.chatGreeting]);
@@ -64,7 +65,8 @@ export default function ChatBot({ isOpen, onClose, language, currentItem, allMen
 
     const userMsg = input;
     setInput('');
-    setMessages(prev => [...prev, { role: 'user', content: userMsg }]);
+    const userMsgId = `user-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    setMessages(prev => [...prev, { id: userMsgId, role: 'user', content: userMsg }]);
     setIsLoading(true);
 
     try {
@@ -138,29 +140,38 @@ export default function ChatBot({ isOpen, onClose, language, currentItem, allMen
             if (item) {
               onAddToCart(item);
               const confirmMsg = t.itemAddedToCart.replace('{item}', item.name);
-              setMessages(prev => [...prev, { role: 'ai', content: confirmMsg }]);
+              const aiMsgId = `ai-cart-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+              setMessages(prev => [...prev, { id: aiMsgId, role: 'ai', content: confirmMsg }]);
             } else {
-              setMessages(prev => [...prev, { role: 'ai', content: "I'm sorry, I couldn't find that item in our menu." }]);
+              const aiErrorId = `ai-error-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+              setMessages(prev => [...prev, { id: aiErrorId, role: 'ai', content: "I'm sorry, I couldn't find that item in our menu." }]);
             }
           }
         }
       } else {
         const responseText = result.text || t.chatError;
-        setMessages(prev => [...prev, { role: 'ai', content: responseText }]);
-
+        
         // Check if this was a "win" message
         if (responseText.includes('QUANTIVO15')) {
-          // Try to find the riddle in previous messages
-          const lastRiddle = messages.slice().reverse().find(m => m.role === 'ai' && m.content.length > 20);
+          const randomRank = (95 + Math.random() * 4.9).toFixed(1);
+          let label = 'GENIUS';
+          if (parseFloat(randomRank) > 99) label = 'GENIUS';
+          else if (parseFloat(randomRank) > 97) label = 'MASTERMIND';
+          else label = 'ELITE';
+
           setShareData({
-            riddle: lastRiddle?.content || 'Armenian Riddle Master',
-            answer: userMsg
+            rank: `${randomRank}%`,
+            label: label
           });
         }
+
+        const aiMsgId = `ai-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+        setMessages(prev => [...prev, { id: aiMsgId, role: 'ai', content: responseText }]);
       }
     } catch (error) {
       console.error("AI Error:", error);
-      setMessages(prev => [...prev, { role: 'ai', content: t.chatError }]);
+      const aiErrorId = `ai-fatal-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+      setMessages(prev => [...prev, { id: aiErrorId, role: 'ai', content: t.chatError }]);
     } finally {
       setIsLoading(false);
     }
@@ -194,8 +205,8 @@ export default function ChatBot({ isOpen, onClose, language, currentItem, allMen
 
             {/* Messages */}
             <div ref={scrollRef} className="flex-1 overflow-y-auto p-4 space-y-4">
-              {messages.map((msg, i) => (
-                <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+              {messages.map((msg) => (
+                <div key={msg.id} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                   <div className={`max-w-[85%] p-4 rounded-2xl text-xs relative group ${
                     msg.role === 'user' 
                       ? 'bg-white text-black rounded-tr-none shadow-lg' 
@@ -203,24 +214,26 @@ export default function ChatBot({ isOpen, onClose, language, currentItem, allMen
                   }`}>
                     <ReactMarkdown>{msg.content}</ReactMarkdown>
                     {msg.role === 'ai' && msg.content.includes('QUANTIVO15') && (
-                      <div className="mt-4 p-4 rounded-2xl bg-amber-500/5 border border-amber-500/20 space-y-3">
-                        <div className="flex items-center gap-2 text-amber-500">
-                          <Sparkles size={14} />
-                          <span className="text-[10px] uppercase tracking-widest font-bold">Riddle Solved</span>
+                      <div className="mt-4 p-4 rounded-2xl bg-amber-500/10 border border-amber-500/30 space-y-4">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2 text-amber-500">
+                            <Sparkles size={14} />
+                            <span className="text-[10px] uppercase tracking-widest font-bold">Riddle Master</span>
+                          </div>
+                          <span className="bg-amber-500 text-black text-[8px] font-black px-2 py-0.5 rounded-full uppercase tracking-tighter">Verified</span>
                         </div>
+                        
                         <div className="space-y-1">
-                          <p className="text-[10px] text-zinc-500 uppercase tracking-widest font-bold">Question</p>
-                          <p className="text-xs italic text-zinc-300">"{shareData.riddle}"</p>
+                          <p className="text-[9px] text-zinc-500 uppercase tracking-widest font-bold">Your Rank</p>
+                          <p className="text-xl text-amber-500 font-black tracking-tighter">#{shareData.label}</p>
+                          <p className="text-[10px] text-zinc-400">Top {shareData.rank} of customers</p>
                         </div>
-                        <div className="space-y-1">
-                          <p className="text-[10px] text-zinc-500 uppercase tracking-widest font-bold">Answer</p>
-                          <p className="text-sm font-medium text-amber-500">{shareData.answer}</p>
-                        </div>
+
                         <button 
                           onClick={() => setShowShare(true)}
-                          className="w-full flex items-center justify-center gap-2 bg-amber-500 text-black py-2 rounded-xl text-[10px] uppercase tracking-widest font-bold hover:bg-amber-400 transition-colors"
+                          className="w-full flex items-center justify-center gap-3 bg-amber-500 text-black py-4 rounded-2xl text-xs font-black uppercase tracking-[0.2em] hover:bg-amber-400 transition-all active:scale-95 shadow-[0_0_30px_rgba(245,158,11,0.4)]"
                         >
-                          <Instagram size={12} /> Share Achievement
+                          <Download size={16} /> Create Screenshot
                         </button>
                       </div>
                     )}
@@ -264,8 +277,8 @@ export default function ChatBot({ isOpen, onClose, language, currentItem, allMen
       <ShareCard 
         isOpen={showShare}
         onClose={() => setShowShare(false)}
-        riddle={shareData.riddle}
-        answer={shareData.answer}
+        rank={shareData.rank}
+        label={shareData.label}
         language={language}
       />
     </AnimatePresence>
