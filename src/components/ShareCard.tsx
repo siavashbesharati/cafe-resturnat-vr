@@ -10,10 +10,11 @@ interface ShareCardProps {
   onClose: () => void;
   rank: string;
   label: string;
+  userName: string;
   language: Language;
 }
 
-export default function ShareCard({ isOpen, onClose, rank, label, language }: ShareCardProps) {
+export default function ShareCard({ isOpen, onClose, rank, label, userName, language }: ShareCardProps) {
   const t = uiTranslations[language];
   const cardRef = useRef<HTMLDivElement>(null);
 
@@ -79,9 +80,12 @@ export default function ShareCard({ isOpen, onClose, rank, label, language }: Sh
                     YOU ARE A<br />
                     <span style={{ color: '#f59e0b' }}>{label}</span>
                   </h2>
-                  <p className="text-sm font-medium leading-relaxed" style={{ color: '#a1a1aa' }}>
-                    You solved a riddle that <span className="text-white font-bold">{rank}</span> of our customers could not solve.
-                  </p>
+                  <div className="space-y-1">
+                    <p className="text-[10px] uppercase tracking-[0.2em] font-bold" style={{ color: '#f59e0b' }}>{userName}</p>
+                    <p className="text-sm font-medium leading-relaxed" style={{ color: '#a1a1aa' }}>
+                      You solved a riddle that <span className="text-white font-bold">{rank}</span> of our customers could not solve.
+                    </p>
+                  </div>
                 </div>
                 
                 <div className="space-y-2">

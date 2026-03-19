@@ -28,7 +28,7 @@ export default function ChatBot({ isOpen, onClose, language, currentItem, allMen
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [showShare, setShowShare] = useState(false);
-  const [shareData, setShareData] = useState({ rank: '99.8%', label: 'GENIUS' });
+  const [shareData, setShareData] = useState({ rank: '99.8%', label: 'GENIUS', userName: '' });
   const scrollRef = useRef<HTMLDivElement>(null);
 
   const addToCartTool: FunctionDeclaration = {
@@ -160,10 +160,11 @@ export default function ChatBot({ isOpen, onClose, language, currentItem, allMen
           else if (parseFloat(randomRank) > 97) label = 'MASTERMIND';
           else label = 'ELITE';
 
-          setShareData({
+          setShareData(prev => ({
+            ...prev,
             rank: `${randomRank}%`,
             label: label
-          });
+          }));
         }
 
         const aiMsgId = `ai-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
@@ -224,15 +225,29 @@ export default function ChatBot({ isOpen, onClose, language, currentItem, allMen
                           <span className="bg-amber-500 text-black text-[8px] font-black px-2 py-0.5 rounded-full uppercase tracking-tighter">Verified</span>
                         </div>
                         
-                        <div className="space-y-1">
-                          <p className="text-[9px] text-zinc-500 uppercase tracking-widest font-bold">Your Rank</p>
-                          <p className="text-xl text-amber-500 font-black tracking-tighter">#{shareData.label}</p>
-                          <p className="text-[10px] text-zinc-400">Top {shareData.rank} of customers</p>
+                        <div className="space-y-4">
+                          <div className="space-y-1">
+                            <p className="text-[9px] text-zinc-500 uppercase tracking-widest font-bold">Your Rank</p>
+                            <p className="text-xl text-amber-500 font-black tracking-tighter">#{shareData.label}</p>
+                            <p className="text-[10px] text-zinc-400">Top {shareData.rank} of customers</p>
+                          </div>
+
+                          <div className="space-y-2">
+                            <p className="text-[9px] text-zinc-500 uppercase tracking-widest font-bold">{t.enterName}</p>
+                            <input
+                              type="text"
+                              value={shareData.userName}
+                              onChange={(e) => setShareData(prev => ({ ...prev, userName: e.target.value }))}
+                              placeholder="..."
+                              className="w-full bg-black/50 border border-amber-500/30 rounded-xl py-2 px-4 text-white text-xs focus:outline-none focus:border-amber-500 transition-colors"
+                            />
+                          </div>
                         </div>
 
                         <button 
                           onClick={() => setShowShare(true)}
-                          className="w-full flex items-center justify-center gap-3 bg-amber-500 text-black py-4 rounded-2xl text-xs font-black uppercase tracking-[0.2em] hover:bg-amber-400 transition-all active:scale-95 shadow-[0_0_30px_rgba(245,158,11,0.4)]"
+                          disabled={!shareData.userName.trim()}
+                          className="w-full flex items-center justify-center gap-3 bg-amber-500 text-black py-4 rounded-2xl text-xs font-black uppercase tracking-[0.2em] hover:bg-amber-400 transition-all active:scale-95 shadow-[0_0_30px_rgba(245,158,11,0.4)] disabled:opacity-50 disabled:shadow-none"
                         >
                           <Instagram size={16} /> {t.shareAsStory}
                         </button>
@@ -280,6 +295,7 @@ export default function ChatBot({ isOpen, onClose, language, currentItem, allMen
         onClose={() => setShowShare(false)}
         rank={shareData.rank}
         label={shareData.label}
+        userName={shareData.userName}
         language={language}
       />
     </AnimatePresence>

@@ -30,6 +30,7 @@ export const uiTranslations: Record<Language, any> = {
     subtotal: "Subtotal",
     discount: "Discount",
     shareAsStory: "Share as Story",
+    enterName: "Enter your name",
     categories: {
       Food: "Food",
       Breakfast: "Breakfast",
@@ -66,6 +67,7 @@ export const uiTranslations: Record<Language, any> = {
     subtotal: "Ենթագումար",
     discount: "Զեղչ",
     shareAsStory: "Կիսվել որպես Story",
+    enterName: "Մուտքագրեք ձեր անունը",
     categories: {
       Food: "Սնունդ",
       Breakfast: "Նախաճաշ",
@@ -102,6 +104,7 @@ export const uiTranslations: Record<Language, any> = {
     subtotal: "Подытог",
     discount: "Скидка",
     shareAsStory: "Поделиться в Story",
+    enterName: "Введите ваше имя",
     categories: {
       Food: "Еда",
       Breakfast: "Завтрак",
@@ -138,6 +141,7 @@ export const uiTranslations: Record<Language, any> = {
     subtotal: "Ara Toplam",
     discount: "İndirim",
     shareAsStory: "Story olarak paylaş",
+    enterName: "Adınızı girin",
     categories: {
       Food: "Yemek",
       Breakfast: "Kahvaltı",
@@ -174,6 +178,7 @@ export const uiTranslations: Record<Language, any> = {
     subtotal: "جمع جزء",
     discount: "تخفیف",
     shareAsStory: "اشتراک‌گذاری در استوری",
+    enterName: "نام خود را وارد کنید",
     categories: {
       Food: "غذا",
       Breakfast: "صبحانه",
